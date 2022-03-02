@@ -1,7 +1,10 @@
 import cv2
 import mediapipe as mp
 import time
+import os
 # pip install mediapipe
+
+# example use: python3 demo_mediapipe_video.py
 
 
 mp_drawing = mp.solutions.drawing_utils
@@ -12,13 +15,24 @@ mp_hands = mp.solutions.hands
 cap = cv2.VideoCapture(0)
 
 # Read video file
-cap = cv2.VideoCapture(
-    '/media/boom/HDD/FanBu/Stuff/PhD/research/HP_Lab/HandPose/ROSbag/20220128_143907/Yezhi.mp4')
+input_dataset_folder = "/media/boom/HDD/FanBu/Stuff/PhD/research/HP_Lab/HandPose/ROSbag/20220222"
+# normalToF1p, normalStereo1p, normalLidar1p,
+# lowLightToF1p, lowLightStereo1p, lowLightLidar1p,
+# normalToF2p, lowLightToF2p
+input_video_name = "lowLightLidar1p"
+input_video_path = os.path.join(
+    input_dataset_folder, input_video_name, input_video_name+".mp4")
+print("input_video_path = ", input_video_path)
+
+result_video_name = "mediapipe_"+input_video_name+".mp4"
+
+cap = cv2.VideoCapture(input_video_path)
+
 
 # Define the codec and create VideoWriter object
 fourcc = cv2.VideoWriter_fourcc(*'mp4v')
 out = cv2.VideoWriter(
-    'Yezhi_mediapipe.mp4', fourcc, 30.0, (1280, 720))
+    result_video_name, fourcc, 30.0, (1280, 720))
 
 current_fps = 0
 fps_period = 5
