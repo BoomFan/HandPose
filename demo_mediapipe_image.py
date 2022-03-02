@@ -3,14 +3,21 @@ import mediapipe as mp
 import os
 # pip install mediapipe
 
+# example use: python3 demo_mediapipe_image.py
 
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
 mp_hands = mp.solutions.hands
 
-input_img_folder = "/media/boom/HDD/FanBu/Stuff/PhD/research/HP_Lab/HandPose/ROSbag/20220222/lowLightToF1p/color"
-# 1645564714.578840, 1645564713.711683
-input_img_name = "1645564713.711683.png"
+input_img_folder = "/media/boom/HDD/FanBu/Stuff/PhD/research/HP_Lab/HandPose/ROSbag/20220222/lowLightLidar1p/color"
+# normalToF1p: 1645564599.865928
+# normalStereo1p: 1645564600.177692
+# normalLidar1p: 1645564034.126845
+
+# lowLightToF1p: 1645564714.578840, 1645564713.711683
+# lowLightStereo1p: 1645564714.572248
+# lowLightLidar1p: 1645564185.588453, 1645564185.648413
+input_img_name = "1645564185.648413.png"
 input_img_path = os.path.join(input_img_folder, input_img_name)
 
 result_img_name = "result_"+input_img_name
