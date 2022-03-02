@@ -14,10 +14,10 @@ input_img_folder = "/media/boom/HDD/FanBu/Stuff/PhD/research/HP_Lab/HandPose/ROS
 # normalStereo1p: 1645564600.177692
 # normalLidar1p: 1645564034.126845
 
-# lowLightToF1p: 1645564714.578840, 1645564713.711683
+# lowLightToF1p: 1645564714.578840
 # lowLightStereo1p: 1645564714.572248
-# lowLightLidar1p: 1645564185.588453, 1645564185.648413
-input_img_name = "1645564185.648413.png"
+# lowLightLidar1p: 1645564185.588453
+input_img_name = "1645564185.588453.png"
 input_img_path = os.path.join(input_img_folder, input_img_name)
 
 result_img_name = "result_"+input_img_name
