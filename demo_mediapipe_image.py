@@ -30,13 +30,13 @@ with mp_hands.Hands(
     frame = cv2.imread(input_img_path)
 
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-    result_frame = hands.process(frame)
+    frame_result = hands.process(frame)
 
     # Draw the hand annotations on the image.
     frame.flags.writeable = True
     frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-    if result_frame.multi_hand_landmarks:
-        for hand_landmarks in result_frame.multi_hand_landmarks:
+    if frame_result.multi_hand_landmarks:
+        for hand_landmarks in frame_result.multi_hand_landmarks:
             mp_drawing.draw_landmarks(
                 frame,
                 hand_landmarks,
