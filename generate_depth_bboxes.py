@@ -4,6 +4,77 @@ import os
 
 # example use: python3 generate_depth_bboxes.py
 
+
+def landmark_2_x_y_depth(hand_landmarks, depth_timestamp_str, depth_frame, DEBUG_MODE=False):
+    landmark_num = len(hand_landmarks.landmark)
+    mark_x_avr = 0
+    mark_y_avr = 0
+    mark_depth_avr = 0
+    valid_num = 0
+    for landmark_idx in range(landmark_num):
+        mark_x_normed = hand_landmarks.landmark[landmark_idx].x
+        mark_y_normed = hand_landmarks.landmark[landmark_idx].y
+        mark_z_normed = hand_landmarks.landmark[landmark_idx].z
+        # z value has its 3D meaning, we just not use it here.
+        # this website could help https://github.com/google/mediapipe/issues/742
+        mark_x = int(color_frame_width*mark_x_normed)
+        mark_x = min(max(mark_x, 0), color_frame_width-1)
+        mark_y = int(color_frame_height*mark_y_normed)
+        mark_y = min(max(mark_y, 0), color_frame_height-1)
+        mark_depth = depth_frame[mark_y, mark_x]
+        if mark_depth > 0 and mark_depth < 2000:
+            mark_x_avr += mark_x
+            mark_y_avr += mark_y
+            mark_depth_avr += mark_depth
+            valid_num += 1
+
+        if DEBUG_MODE:
+            # print("hand_landmarks = ", hand_landmarks)
+            print("landmark_num = ", landmark_num)
+            print("mark_x = ", mark_x)
+            print("mark_y = ", mark_y)
+            print(
+                f"depth_frame[{mark_y}, {mark_x}] = {depth_frame[mark_y, mark_x]}")
+    mark_x_avr = int(mark_x_avr/valid_num)
+    mark_x_avr = min(max(mark_x_avr, 0),
+                     color_frame_width-1)
+    mark_y_avr = int(mark_y_avr/valid_num)
+    mark_y_avr = min(max(mark_y_avr, 0),
+                     color_frame_height-1)
+    mark_depth_avr = int(mark_depth_avr/valid_num)
+    # Detect one hand, save the result bbox in a txt file.
+    # img_name    x_in_width    y_in_height    depth_in_mm
+    landmark_str = depth_timestamp_str+".png"+"    " + \
+        str(mark_x_avr) + "    "+str(mark_y_avr) + \
+        "    "+str(mark_depth_avr)+"\n"
+    return landmark_str
+
+
+def landmark_2_bbox(hand_landmarks, depth_timestamp_str):
+    landmark_num = len(hand_landmarks.landmark)
+    mark_x_list = []
+    mark_y_list = []
+    for landmark_idx in range(landmark_num):
+        mark_x_normed = hand_landmarks.landmark[landmark_idx].x
+        mark_y_normed = hand_landmarks.landmark[landmark_idx].y
+        mark_z_normed = hand_landmarks.landmark[landmark_idx].z
+        # z value has its 3D meaning, we just not use it here.
+        # this website could help https://github.com/google/mediapipe/issues/742
+        mark_x = int(color_frame_width*mark_x_normed)
+        mark_x = min(max(mark_x, 0), color_frame_width-1)
+        mark_x_list.append(mark_x)
+        mark_y = int(color_frame_height*mark_y_normed)
+        mark_y = min(max(mark_y, 0), color_frame_height-1)
+        mark_y_list.append(mark_y)
+
+    # Detect one hand, save the result bbox in a txt file.
+    # img_name    x_min    y_min    x_max    y_max
+    landmark_str = depth_timestamp_str+".png"+"    " + \
+        str(min(mark_x_list)) + "    "+str(min(mark_y_list)) + \
+        "    "+str(max(mark_x_list))+"    "+str(max(mark_y_list))+"\n"
+    return landmark_str
+
+
 DEBUG_MODE = False
 
 input_dataset_folder = "/media/boom/HDD/FanBu/Stuff/PhD/research/HP_Lab/HandPose/ROSbag/20220222/normalLidar1p"
@@ -107,46 +178,11 @@ with mp_hands.Hands(
 
             if frame_result.multi_hand_landmarks:
                 for hand_landmarks in frame_result.multi_hand_landmarks:
-                    landmark_num = len(hand_landmarks.landmark)
-                    mark_x_avr = 0
-                    mark_y_avr = 0
-                    mark_depth_avr = 0
-                    valid_num = 0
-                    for landmark_idx in range(landmark_num):
-                        mark_x_normed = hand_landmarks.landmark[landmark_idx].x
-                        mark_y_normed = hand_landmarks.landmark[landmark_idx].y
-                        mark_z_normed = hand_landmarks.landmark[landmark_idx].z
-                        # z value has its 3D meaning, we just not use it here.
-                        # this website could help https://github.com/google/mediapipe/issues/742
-                        mark_x = int(color_frame_width*mark_x_normed)
-                        mark_x = min(max(mark_x, 0), color_frame_width-1)
-                        mark_y = int(color_frame_height*mark_y_normed)
-                        mark_y = min(max(mark_y, 0), color_frame_height-1)
-                        mark_depth = depth_frame[mark_y, mark_x]
-                        if mark_depth > 0 and mark_depth < 2000:
-                            mark_x_avr += mark_x
-                            mark_y_avr += mark_y
-                            mark_depth_avr += mark_depth
-                            valid_num += 1
-
-                        if DEBUG_MODE:
-                            # print("hand_landmarks = ", hand_landmarks)
-                            print("landmark_num = ", landmark_num)
-                            print("mark_x = ", mark_x)
-                            print("mark_y = ", mark_y)
-                            print(
-                                f"depth_frame[{mark_y}, {mark_x}] = {depth_frame[mark_y, mark_x]}")
-                    mark_x_avr = int(mark_x_avr/valid_num)
-                    mark_x_avr = min(max(mark_x_avr, 0),
-                                     color_frame_width-1)
-                    mark_y_avr = int(mark_y_avr/valid_num)
-                    mark_y_avr = min(max(mark_y_avr, 0),
-                                     color_frame_height-1)
-                    mark_depth_avr = int(mark_depth_avr/valid_num)
-                    # Detect one hand, save the result bbox in a txt file.
-                    # img_name    x_in_width    y_in_height    depth_in_mm
-                    file_object.write(depth_timestamp_str+".png"+"    "+str(mark_x_avr)
-                                      + "    "+str(mark_y_avr)+"    "+str(mark_depth_avr)+"\n")
+                    # landmark_str = landmark_2_x_y_depth(
+                    #     hand_landmarks, depth_timestamp_str, depth_frame)
+                    landmark_str = landmark_2_bbox(
+                        hand_landmarks, depth_timestamp_str)
+                    file_object.write(landmark_str)
 
                     if DEBUG_MODE:
                         # depth_frame_debug = cv2.cvtColor(
